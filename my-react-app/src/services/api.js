@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuración de la API
-const API_URL = 'https://localhost:7181/api';
+const API_URL = 'https://apigestor-bhd8bkf3chhmgkhb.centralus-01.azurewebsites.net/api';
 
 // Crear instancia de axios con configuración base
 const api = axios.create({
@@ -54,7 +54,12 @@ export const getTasks = async () => {
 
 export const createTask = async (taskData) => {
   try {
-    const response = await api.post('/Task', taskData);
+    // Construir los parámetros de consulta
+    const params = new URLSearchParams();
+    if (taskData.title) params.append('title', taskData.title);
+    if (taskData.description) params.append('description', taskData.description);
+    
+    const response = await api.post(`/Task?${params.toString()}`, '');
     return response.data;
   } catch (error) {
     console.error('Error al crear tarea:', error);
@@ -64,7 +69,13 @@ export const createTask = async (taskData) => {
 
 export const updateTask = async (id, taskData) => {
   try {
-    const response = await api.put(`/Task/${id}`, taskData);
+    // Construir los parámetros de consulta
+    const params = new URLSearchParams();
+    if (taskData.title) params.append('title', taskData.title);
+    if (taskData.description) params.append('description', taskData.description);
+    if (taskData.completed !== undefined) params.append('completed', taskData.completed);
+    
+    const response = await api.put(`/Task/${id}?${params.toString()}`);
     return response.data;
   } catch (error) {
     console.error('Error al actualizar tarea:', error);

@@ -5,43 +5,32 @@ import { createTask, updateTask } from '../../services/api';
 const TaskForm = ({ show, onHide, onSubmit, task }) => {
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
-    dueDate: '',
-    completed: false
+    description: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (task) {
-      // Formatear la fecha para el input de tipo date
-      const formattedDate = task.dueDate 
-        ? new Date(task.dueDate).toISOString().split('T')[0]
-        : '';
-      
       setFormData({
         title: task.title || '',
-        description: task.description || '',
-        dueDate: formattedDate,
-        completed: task.completed || false
+        description: task.description || ''
       });
     } else {
       // Resetear el formulario cuando no hay tarea para editar
       setFormData({
         title: '',
-        description: '',
-        dueDate: '',
-        completed: false
+        description: ''
       });
     }
     setError('');
   }, [task, show]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
@@ -60,16 +49,16 @@ const TaskForm = ({ show, onHide, onSubmit, task }) => {
       
       if (task) {
         // Actualizar tarea existente
-        await updateTask(task.id, formData);
+        const updatedTask = await updateTask(task.id, formData);
+        onSubmit(updatedTask);
       } else {
         // Crear nueva tarea
-        await createTask(formData);
+        const newTask = await createTask(formData);
+        onSubmit(newTask);
       }
-      
-      onSubmit();
     } catch (err) {
       setError('Error al guardar la tarea. Intente de nuevo.');
-      console.error(err);
+      console.error('Error en handleSubmit:', err);
     } finally {
       setLoading(false);
     }
@@ -106,26 +95,41 @@ const TaskForm = ({ show, onHide, onSubmit, task }) => {
             />
           </FloatingLabel>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Fecha de vencimiento</Form.Label>
-            <Form.Control
-              type="date"
-              name="dueDate"
-              value={formData.dueDate}
-              onChange={handleChange}
-              required
+          {task && (
+            <Form.Check
+              type="switch"
+              id="completed"
+              name="completed"
+              label="Completada"
+              checked={task.completed || false}
+              onChange={async (e) => {
+                if (task) {
+                  try {
+                    setLoading(true);
+                    const updatedTask = await updateTask(task.id, {
+                      ...formData,
+                      completed: e.target.checked
+                    });
+                    // Actualizar el estado local del formulario
+                    setFormData(prev => ({
+                      ...prev,
+                      completed: e.target.checked
+                    }));
+                    // Notificar al componente padre
+                    if (onSubmit) {
+                      onSubmit(updatedTask);
+                    }
+                  } catch (err) {
+                    console.error('Error actualizando estado de la tarea:', err);
+                    setError('Error al actualizar el estado de la tarea');
+                  } finally {
+                    setLoading(false);
+                  }
+                }
+              }}
+              className="mb-3"
             />
-          </Form.Group>
-
-          <Form.Check
-            type="switch"
-            id="completed"
-            name="completed"
-            label="Completada"
-            checked={formData.completed}
-            onChange={handleChange}
-            className="mb-3"
-          />
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={onHide} disabled={loading}>
