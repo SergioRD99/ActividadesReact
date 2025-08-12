@@ -6,7 +6,7 @@ import './App.css';
 function App() {
   return (
     <div className="d-flex flex-column min-vh-100">
-      {/* Navbar - Full Width */}
+      
       <Navbar bg="dark" variant="dark" expand="lg" className="shadow-sm" sticky="top">
         <Container fluid="lg">
           <Navbar.Brand href="#" className="d-flex align-items-center">

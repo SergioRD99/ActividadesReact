@@ -141,8 +141,7 @@ const TaskList = () => {
                     e.currentTarget.style.transform = 'translateY(0)';
                     e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)';
                   }}>
-                  <BootstrapCard.Body className="d-flex flex-column p-4">
-                    {/* Status Badge with Icon and Label */}
+                  <BootstrapCard.Body className="d-flex flex-column p-4">                    
                     <div className="position-absolute d-flex align-items-center gap-1" 
                          style={{ 
                            top: '1rem', 

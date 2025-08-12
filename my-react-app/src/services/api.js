@@ -11,7 +11,7 @@ const api = axios.create({
   },
 });
 
-// Solo configurar el agente HTTPS en entorno de Node.js (no en el navegador)
+
 if (typeof window === 'undefined') {
   const https = require('https');
   api.defaults.httpsAgent = new https.Agent({  
@@ -43,8 +43,8 @@ api.interceptors.response.use(
 
 export const getTasks = async () => {
   try {
-    const response = await api.get('/Task'); // Cambiado a 'Task' con T mayúscula
-    console.log('Tasks response:', response.data); // Para depuración
+    const response = await api.get('/Task'); 
+    console.log('Tasks response:', response.data); 
     return response.data;
   } catch (error) {
     console.error('Error al obtener tareas:', error);
